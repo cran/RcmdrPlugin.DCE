@@ -768,7 +768,16 @@ dceFitmodel <- function() {
     responseVarFrame,
     Variables(),
     initialSelection = dialog.values$ini.responseVarName,
-    title = "")
+    title = "Response variable")
+
+  # Independent variables (Added 0.1-3)
+  independentVarFrame <- tkframe(top)
+  independentVarBox <- variableListBox(
+    independentVarFrame,
+    Variables(),
+    title = "Independent variables (pick one or more)",
+    selectmode = "multiple",
+    listHeight = 5)
 
   # Stratification variable
   strataFrame    <- tkframe(top)
@@ -777,7 +786,7 @@ dceFitmodel <- function() {
     strataVarFrame,
     Variables(),
     initialSelection = dialog.values$ini.strataVarName,
-    title = "")
+    title = "Stratification variable")
 
     
   ##### onOK function #####
@@ -785,6 +794,8 @@ dceFitmodel <- function() {
 
     responseVar <- getSelection(responseVarBox)
     strataVar   <- getSelection(strataVarBox)
+    indVar      <- getSelection(independentVarBox)  # Added 0.1-3
+    if(length(indVar) == 0) covVar <- "1"           # Added 0.1-3
     
     putDialog("dceFitmodel", list(
       ini.responseVarName = responseVar,
@@ -803,8 +814,10 @@ dceFitmodel <- function() {
       subset <- paste(", subset = ", subset, sep = "")
       putRcmdr("modelWithSubset", TRUE)
     }
+
+    rhsVars <- paste(indVar, collapse = " + ")    # Added 0.1-3
     
-    formula <- paste(responseVar, " ~ ", tclvalue(rhsVariable), 
+    formula <- paste(responseVar, " ~ ", rhsVars, # Modified 0.1-3 
                      " + strata(", strataVar ,")", sep = "")
 
     cmd <- paste("clogit(", formula, ", data = ", ActiveDataSet(), subset, ")",
@@ -840,26 +853,15 @@ dceFitmodel <- function() {
          sticky = "w")
 
   ## Response variable
-  tkgrid(labelRcmdr(responseVarFrame, 
-                    text = gettextRcmdr("1) Response variable ")),
-  getFrame(responseVarBox), sticky = "w")
+  tkgrid(getFrame(responseVarBox), sticky = "w") # Modified 0.1-3
   tkgrid(responseVarFrame, sticky = "w")
 
-  ## Independent variables
-  tkgrid(labelRcmdr(top, text = gettextRcmdr("2) Independent variables")),
-         sticky = "w")
+  ## Independent variables (Modified 0.1-3)
+  tkgrid(getFrame(independentVarBox), sticky = "w")
+  tkgrid(independentVarFrame, sticky = "w")
 
-  ## Model formula and variable box
-  modelFormula(hasLhs = FALSE, rhsExtras = TRUE, formulaLabel = "")
-  subsetBox(model = TRUE)
-  tkgrid(getFrame(xBox), sticky = "w")
-  tkgrid(outerOperatorsFrame, sticky = "ew")
-  tkgrid(formulaFrame, sticky = "w")
-
-  ## Stratification variable
-  tkgrid(labelRcmdr(strataVarFrame, 
-                    text = gettextRcmdr("3) Stratification variable ")),
-  getFrame(strataVarBox), sticky = "w")
+  ## Stratification variable (Modified 0.1-3)
+  tkgrid(getFrame(strataVarBox), sticky = "w")
   tkgrid(strataVarFrame, sticky = "w")
   tkgrid(strataFrame, sticky = "w")
 
@@ -867,6 +869,7 @@ dceFitmodel <- function() {
   tkgrid(labelRcmdr(top, text = ""))
 
   ## Subset
+  subsetBox(model = TRUE)
   tkgrid(subsetFrame, sticky = "w")
 
   # OK Cancel Help Buttons
