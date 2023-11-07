@@ -4,9 +4,9 @@
 \alias{dceDesign}
 \alias{resetDceTable}
 \alias{dceQuestions}
-\alias{dceDesignMatrix}
-\alias{loadDceDesignMatrix}
+\alias{dceLoad}
 \alias{dceDataset}
+\alias{dceInteract}
 \alias{dceFitmodel}
 \alias{resetDceModel}
 \alias{dceMwtp}
@@ -42,39 +42,46 @@ Selecting \dQuote{DCE} displays menu items. When selecting a menu item,
 the corresponding dialog box opens. The following dialog boxes are 
 provided by \pkg{RcmdrPlugin.DCE}:
 \itemize{
+
    \item The dialog box for \dQuote{Design choice sets...} designs 
 choice sets for DCE with the rotation design method or mix-and-match method 
 using the function \code{\link[support.CEs]{rotation.design}} 
 in \pkg{\link{support.CEs}}.
-   \item The dialog box for \dQuote{Create questions...} 
-creates DCE questions from the choice sets designed in the first dialog box 
+
+   \item The dialog box for \dQuote{Display questions...} 
+shows DCE questions from the choice sets designed in the first dialog box 
 using the function \code{\link[support.CEs]{questionnaire}} in \pkg{\link{support.CEs}}.
-   \item The dialog box for \dQuote{Create design matrix...} creates 
-a design matrix from the choice sets designed in the first daialog box 
-using the function \code{\link[support.CEs]{make.design.matrix}} 
-in \pkg{\link{support.CEs}}. The resultant design matrix can be also 
-saved as a CSV file with the option \dQuote{Save as CSV file}.
-   \item The dialog box for \dQuote{Import design matrix...} read a CSV file 
-containing the design matrix saved in the previous dialog box using 
-the function \code{\link[utils]{read.table}} in \pkg{\link{utils}}. 
+
    \item The dialog box for \dQuote{Create data set for analysis...} 
 creates a data set for analysis from the choice sets designed in the first 
 dialog box and a data set containing responses to DCE questions using 
-the function \code{\link[support.CEs]{make.dataset}} 
-in \pkg{\link{support.CEs}}.
-   \item The dialog box for \dQuote{Fit model...} implements a conditional 
-logit model analysis of the data set for analysis generated in the previous 
-dialog box using the functions \code{\link[survival]{clogit}} 
-in \pkg{survival} and \code{\link[support.CEs]{gofm}} 
-in \pkg{\link{support.CEs}}. The menu item \dQuote{Fit model...} is activated 
-if a data set for analysis created in the previous dialog box is selected as 
+the function \code{\link[support.CEs]{ce.dataset}} 
+in \pkg{\link{support.CEs}}. The menu item is activated if a data frame is 
+selected as the active data set.
+
+   \item The dialog box for \dQuote{Create interactions...} creates 
+interactions between attribute/level variables and covariates 
+in the data set for analysis. The menu item is activated 
+if the data set for analysis created in the previous dialog box is selected as 
 the active data set.
+
+   \item The dialog box for \dQuote{Fit model...} implements a conditional 
+logit model analysis of the data set for analysis using the functions 
+\code{\link[survival]{clogit}} in \pkg{survival} and \code{\link[support.CEs]{gofm}} 
+in \pkg{\link{support.CEs}}. The menu item is activated 
+if the data set for analysis created in the previous dialog box is selected as 
+the active data set.
+
    \item The dialog box for \dQuote{Calculate MWTPs...} 
 calculates marginal willingness to pays (MWTPs) of non-monetary variables 
 from the model fitted in the previous dialog box using the function 
 \code{\link[support.CEs]{mwtp}} in \pkg{\link{support.CEs}}. The menu item 
-\dQuote{Calculate MWTPs...} is activated if the active model is of 
-class \code{"clogit"}.
+is activated if the active model is of class \code{"clogit"}.
+
+   \item The dialog box for \dQuote{Load saved objects...} loads an R Data file 
+saved in the dialog box for \dQuote{Design choice sets...} or 
+\dQuote{Create data set for analysis...}
+using the function \code{\link[base]{load}} in \pkg{\link{base}}. 
 }
 }
 

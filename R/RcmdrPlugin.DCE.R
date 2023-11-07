@@ -36,7 +36,8 @@ dceDesign <- function() {
     A3Var = "0",
     A4Var = "0",
     A5Var = "0",
-    A6Var = "0")
+    A6Var = "0",
+    saveVariable = "0")
   dialog.values <- getDialog("dceDesign", defaults)
 
   
@@ -52,11 +53,13 @@ dceDesign <- function() {
   inputsFrame       <- tkframe(top)
   designMethodFrame <- tkframe(inputsFrame)
   AltBlkRngFrame    <- tkframe(inputsFrame)
+  RNGFrame          <- tkframe(inputsFrame)
   RNGoptionFrame    <- tkframe(inputsFrame)
   TABLEFrame        <- tkframe(inputsFrame)
   tableFrame        <- tkframe(TABLEFrame)
   rightFrame        <- tkframe(TABLEFrame)
   AttrCheckBoxFrame <- tkframe(rightFrame)
+  saveFrame        <- tkframe(inputsFrame)
   
   # Design method
   radioButtons(
@@ -81,7 +84,7 @@ dceDesign <- function() {
 
   # Seed for RNG
   RNGseedName <- tclVar(dialog.values$RNGseedName)
-  RNGseed     <- ttkentry(AltBlkRngFrame,
+  RNGseed     <- ttkentry(RNGFrame,
                           width = "10",
                           textvariable = RNGseedName)
 
@@ -156,6 +159,9 @@ dceDesign <- function() {
   A6Var <- tclVar(dialog.values$A6Var)
   A6CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A6Var)
   
+  # Save option
+  saveVariable <- tclVar(dialog.values$saveVariable)
+  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
   
   ##### onOK Function #####
   onOK <- function() {
@@ -172,7 +178,8 @@ dceDesign <- function() {
       A3Var = tclvalue(A3Var),
       A4Var = tclvalue(A4Var),
       A5Var = tclvalue(A5Var),
-      A6Var = tclvalue(A6Var)))
+      A6Var = tclvalue(A6Var),
+      saveVariable = tclvalue(saveVariable)))
     
     closeDialog()
 
@@ -274,6 +281,27 @@ dceDesign <- function() {
             sep = ""))
     doItAndPrint(paste(tclvalue(designName)))
     
+    # Save choice sets
+    if (tclvalue(saveVariable) == 1) {
+      saveFile <- tclvalue(tkgetSaveFile(
+        filetypes = gettextRcmdr(
+          ' {"R Data Files" {".rda" ".RDA" ".rdata" ".RData"}}'),
+        defaultextension = ".rda",
+        initialfile = paste0(tclvalue(designName), ".rda"),
+        parent = CommanderWindow()))
+      if (saveFile == "") {
+        tkfocus(CommanderWindow())
+        return()
+      }
+      cmd <- paste0('save(', tclvalue(designName),
+                    ', file = "', saveFile, '")')
+      justDoIt(cmd)
+      logger(cmd)
+      Message(paste0(gettextRcmdr("DCE design exported to file"),
+                     saveFile),
+              type = "note")
+    }
+    
     tkfocus(CommanderWindow())
   }
 
@@ -297,6 +325,13 @@ dceDesign <- function() {
   tkgrid(designmethodFrame, sticky = "w")
   tkgrid(designMethodFrame, sticky = "w")
 
+  ## Design parameter
+  tkgrid(
+    labelRcmdr(
+      AltBlkRngFrame,
+      text = gettextRcmdr("Design parameters:")),
+    sticky = "w")
+
   ## Number of alternatives per set
   tkgrid(
     labelRcmdr(
@@ -308,23 +343,8 @@ dceDesign <- function() {
   tkgrid(labelRcmdr(AltBlkRngFrame,
                     text = gettextRcmdr("Number of blocks ")),
          nBlocks, sticky = "w")
-
-  ## Seed for RNG
-  tkgrid(labelRcmdr(
-           AltBlkRngFrame,
-           text = gettextRcmdr("Seed for random number generator (optional) ")),
-         RNGseed, sticky = "w")
   tkgrid(AltBlkRngFrame, sticky = "w")
 
-  ## RNG option
-  tkgrid(
-    RNGoptionCheckBox,
-      labelRcmdr(
-        RNGoptionFrame,
-        text = gettextRcmdr("Reproduce choice sets designed with R < 3.6.0")),
-    sticky = "w")
-  tkgrid(RNGoptionFrame, sticky = "w")
-  
   ## Table
   tkgrid(labelRcmdr(
     inputsFrame,
@@ -343,6 +363,40 @@ dceDesign <- function() {
 
   tkgrid(rightFrame, tableFrame, sticky = "ew")
   tkgrid(TABLEFrame, sticky = "ew")
+
+  ## Reproducibility
+  tkgrid(labelRcmdr(
+           RNGFrame,
+           text = gettextRcmdr("Reproducibility:")),
+         sticky = "w")
+
+  ## Seed for RNG
+  tkgrid(labelRcmdr(
+           RNGFrame,
+           text = gettextRcmdr("Seed for random number generator (optional) ")),
+         RNGseed, sticky = "w")
+  tkgrid(RNGFrame, sticky = "w")
+
+  ## RNG option
+  tkgrid(
+    RNGoptionCheckBox,
+      labelRcmdr(
+        RNGoptionFrame,
+        text = gettextRcmdr("Reproduce choice sets designed with R < 3.6.0")),
+    sticky = "w")
+  tkgrid(RNGoptionFrame, sticky = "w")
+  
+  # Blank line
+  tkgrid(labelRcmdr(inputsFrame, text = ""))
+
+  # Save choice sets
+  tkgrid(
+    saveCheckBox,
+      labelRcmdr(
+        saveFrame,
+        text = gettextRcmdr("Save the resultant choice sets")),
+    sticky = "w")
+  tkgrid(saveFrame, sticky = "w")
     
   tkgrid(inputsFrame, sticky = "w")
 
@@ -361,7 +415,7 @@ resetDceTable <- function() {
 ###############################################################################
 
 dceQuestions <- function() {
-  initializeDialog(title = gettextRcmdr("Create DCE Questions"))
+  initializeDialog(title = gettextRcmdr("Display DCE Questions"))
   defaults <- list(designName = "DCEdesign")
   dialog.values <- getDialog("dceQuestions", defaults)
   
@@ -398,208 +452,9 @@ dceQuestions <- function() {
   # Name of design
   tkgrid(labelRcmdr(
     inputsFrame,
-    text = gettextRcmdr("Name of design ")),
+    text = gettextRcmdr("Design ")),
     design, sticky = "w")
   tkgrid(inputsFrame, sticky = "w")
-  
-  # OK Cancel Help Buttons
-  tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
-
-  dialogSuffix()
-}
-
-###############################################################################
-
-dceDesignMatrix <- function() {
-  initializeDialog(title = gettextRcmdr("Create Design Matrix"))
-  defaults <- list(
-    designmatrixName = "DCEdesign.matrix",
-    designName       = "DCEdesign",
-    optoutVariable   = "0",
-    saveVariable     = "0")
-  dialog.values <- getDialog("dceDesignMatrix", defaults)
-  
-  env <- environment()
-  
-  
-  ##### Output Frame #####
-  outputFrame <- tkframe(top)
-  
-  designmatrixName <- tclVar(dialog.values$designmatrixName)
-  designmatrix     <- ttkentry(outputFrame, width = "20", 
-                               textvariable = designmatrixName)
-  
-  
-  ##### Input Frame #####
-  inputsFrame <- tkframe(top)
-  designFrame <- tkframe(inputsFrame)
-  optoutFrame <- tkframe(inputsFrame)
-  saveFrame   <- tkframe(inputsFrame)
-  
-  # Choice sets
-  designName <- tclVar(dialog.values$designName)
-  design <- ttkentry(designFrame, width = "20",
-                     textvariable = designName)
-
-  # Opt-out option
-  optoutVariable <- tclVar(dialog.values$optoutVariable)
-  optoutCheckBox <- ttkcheckbutton(optoutFrame, variable = optoutVariable)
-  
-  # Save option
-  saveVariable <- tclVar(dialog.values$saveVariable)
-  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
-  
-  
-  ##### onOK function #####
-  onOK <- function() {
-    
-    putDialog("dceDesignMatrix", list(
-      designmatrixName = tclvalue(designmatrixName),
-      designName       = tclvalue(designName),
-      optoutVariable   = tclvalue(optoutVariable),
-      saveVariable     = tclvalue(saveVariable)))
-    
-    cedes <- tclvalue(designName)
-
-    contA <- eval(parse(text = paste("attr(", cedes, ", 'contA')", sep = "")))
-    cateA <- eval(parse(text = paste("attr(", cedes, ", 'cateA')", sep = "")))
-
-    closeDialog()
-    
-    doItAndPrint(
-      paste(
-        tclvalue(designmatrixName), " <- make.design.matrix(",
-        "choice.experiment.design = ", paste(cedes), 
-        ", optout = ", tclvalue(optoutVariable), 
-        ", categorical.attributes = c('", paste(cateA, collapse = "', '"), "')",
-        ", continuous.attributes  = c('", paste(contA, collapse = "', '"), "')",
-        ", unlabeled = TRUE, common = NULL, binary = FALSE)", sep = ""))
-
-    if(tclvalue(saveVariable) == 1){
-      saveFile <- tclvalue(tkgetSaveFile(
-        filetypes = gettextRcmdr(
-          '{"All Files" {"*"}} {"CSV Files" {".csv" ".CSV"}}'),
-        defaultextension = ".csv",
-        initialfile = paste(tclvalue(designmatrixName), ".csv", sep=""),
-        parent = CommanderWindow()))
-      if (saveFile == "") {
-        tkfocus(CommanderWindow())
-        return()
-      }
-      command <- paste("write.table(", tclvalue(designmatrixName), 
-                       ', "', saveFile, 
-                       '", sep = ",", col.names = TRUE,', 
-                       'row.names = TRUE, quote= TRUE)',
-                       sep = "")
-      justDoIt(command)
-      logger(command)
-      Message(paste(gettextRcmdr("DCE design matrix exported to file"),
-                    saveFile),
-              type = "note")
-    }
-    tkfocus(CommanderWindow())
-  }
-  
-  
-  ##### Specification of dialog box #####
-  # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "make.design.matrix",
-               reset       = "dceDesignMatrix",
-               apply       = "dceDesignMatrix")
-  
-  # Output
-  tkgrid(
-    labelRcmdr(outputFrame,
-               text = gettextRcmdr("Name for design matrix ")),
-    designmatrix, sticky = "w")
-  tkgrid(outputFrame, sticky = "w")
-  
-  # Blank line
-  tkgrid(labelRcmdr(top, text = ""))
-  
-  # Input
-  ## Choice sets
-  tkgrid(labelRcmdr(
-    designFrame,
-    text = gettextRcmdr("Name of design ")),
-    design, sticky = "w")
-  tkgrid(designFrame, sticky = "w")
-  
-  ## Opu-out option
-  tkgrid(optoutCheckBox,
-         labelRcmdr(optoutFrame, text = gettextRcmdr("Use opt-out option")),
-         sticky = "w")
-  tkgrid(optoutFrame, sticky = "w")
-
-  ## Save as CSV file
-  tkgrid(saveCheckBox,
-         labelRcmdr(saveFrame, text = gettextRcmdr("Save as CSV file")),
-         sticky = "w")
-  tkgrid(saveFrame, sticky = "w")
-  
-  tkgrid(inputsFrame, sticky = "w")  
-
-  # OK Cancel Help Buttons
-  tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
-
-  dialogSuffix()
-  
-}
-
-###############################################################################
-
-loadDceDesignMatrix <- function() {
-  initializeDialog(title = gettextRcmdr("Import Design Matrix"))
-  defaults <- list(designmatrixName = "DCEdesign.matrix")
-  dialog.values <- getDialog("dceDesignMatrix", defaults)
-  
-  env <- environment()
-  
-  
-  ##### Output Frame #####
-  outputFrame <- tkframe(top)
-  
-  designmatrixName <- tclVar(dialog.values$designmatrixName)
-  designmatrix     <- ttkentry(outputFrame, width = "20", 
-                               textvariable = designmatrixName)
-  
-  
-  ##### onOK function #####
-  onOK <- function() {
-    
-    putDialog("dceDesignMatrix", list(
-      designmatrixName = tclvalue(designmatrixName)))
-    
-    closeDialog()
-    
-    file <- tclvalue(tkgetOpenFile(filetypes = 
-              gettextRcmdr(' {"CSV Files" {".csv"}} {"All Files" {"*"}}')))
-
-    if (file == "") {
-      return()
-    }
-
-    setBusyCursor()
-    on.exit(setIdleCursor())
-    
-    doItAndPrint(paste0(tclvalue(designmatrixName), ' <- read.table("', 
-                         file, '", header = TRUE, sep = ",")'))
-    
-    tkfocus(CommanderWindow())
-  }
-  
-  
-  ##### Specification of dialog box #####
-  # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "read.table",
-               reset       = "loadDceDesignMatrix")
-  
-  # Output
-  tkgrid(
-    labelRcmdr(outputFrame,
-               text = gettextRcmdr("Name for design matrix ")),
-    designmatrix, sticky = "w")
-  tkgrid(outputFrame, sticky = "w")
   
   # OK Cancel Help Buttons
   tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
@@ -613,8 +468,10 @@ dceDataset <- function() {
   initializeDialog(title = gettextRcmdr("Create Data Set for Analysis"))
   defaults <- list(
     datasetName  = "DCEdata",
-    designName   = "DCEdesign.matrix",
-    responseName = "")
+    designName   = "DCEdesign",
+    responseName = "",
+    optoutVariable = "0",
+    saveVariable = "0")
   dialog.values <- getDialog("dceDataset", defaults)
   
   
@@ -631,6 +488,8 @@ dceDataset <- function() {
   ##### Input Frame #####
   inputsFrame <- tkframe(top)
   tableFrame  <- tkframe(inputsFrame)
+  optoutFrame <- tkframe(inputsFrame)
+  saveFrame   <- tkframe(inputsFrame)
   
   # choice sets
   designName <- tclVar(dialog.values$designName)
@@ -642,30 +501,82 @@ dceDataset <- function() {
   response <- ttkentry(inputsFrame, width = "40",
                          textvariable = responseName)
   
+  # opt-out option
+  optoutVariable <- tclVar(dialog.values$optoutVariable)
+  optoutCheckBox <- ttkcheckbutton(optoutFrame, variable = optoutVariable)
+  
+  # save option
+  saveVariable <- tclVar(dialog.values$saveVariable)
+  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
+  
 
   ##### onOK function #####
   onOK <- function() {
 
     putDialog("dceDataset", list(
-      datasetName   = tclvalue(datasetName),
-      designName    = tclvalue(designName),
-      responseName  = tclvalue(responseName)))
+      datasetName    = tclvalue(datasetName),
+      designName     = tclvalue(designName),
+      responseName   = tclvalue(responseName),
+      optoutVariable = tclvalue(optoutVariable),
+      saveVariable   = tclvalue(saveVariable)))
+    
+    cateA <- eval(parse(text = paste0("attr(", tclvalue(designName),
+                                      ", 'cateA')")))
+    contA <- eval(parse(text = paste0("attr(", tclvalue(designName),
+                                      ", 'contA')")))
+
+    if (tclvalue(optoutVariable) == 1) {
+      optoutTF <- "TRUE"
+    } else {
+      optoutTF <- "FALSE"
+    }
     
     closeDialog()
     responseVars <- unlist(strsplit(x = gsub(' +', '', tclvalue(responseName)),
                                     split = ","))
 
+    # Create data set for analysis
     doItAndPrint(
-      paste(
-        tclvalue(datasetName), " <- make.dataset(",
-        "respondent.dataset = ", activeDataSet(), 
-        ", design.matrix = ", tclvalue(designName), 
-        ', choice.indicators = c("', 
+      paste0(
+        tclvalue(datasetName), ' <- ce.dataset(',
+        'data = ', activeDataSet(), 
+        ', response = c("', 
           paste(responseVars, collapse = '", "'), '")',
-        ", detail = FALSE)", sep = ""))
+        ', design = ', tclvalue(designName), 
+        ', categorical.attributes = c("',
+          paste(cateA, collapse = '", "'), '")',
+        ', continuous.attributes = c("',
+          paste(contA, collapse = '", "'), '")',
+        ', common = NULL',
+        ', optout = ', optoutTF,
+        ', unlabeled = TRUE',
+        ', binary = FALSE',
+        ', detail = FALSE)'))
 
-    justDoIt(paste0('class(', tclvalue(datasetName), 
-                    ') <- c("dcedataset", "data.frame")'))
+    activeDataSet(tclvalue(datasetName))
+    
+    # Save data set
+    if (tclvalue(saveVariable) == 1) {
+      saveFile <- tclvalue(tkgetSaveFile(
+        filetypes = gettextRcmdr(
+          ' {"R Data Files" {".rda" ".RDA" ".rdata" ".RData"}}'),
+        defaultextension = ".rda",
+        initialfile = paste0(tclvalue(datasetName), ".rda"),
+        parent = CommanderWindow()))
+      if (saveFile == "") {
+        tkfocus(CommanderWindow())
+        return()
+      }
+      cmd <- paste0('save(', tclvalue(datasetName),
+                    ', file = "', saveFile, '")')
+      justDoIt(cmd)
+      logger(cmd)
+      Message(
+        paste0(
+          gettextRcmdr("DCE data set for analysis exported to file"),
+          saveFile),
+        type = "note")
+    }
         
     tkfocus(CommanderWindow())
     
@@ -674,7 +585,7 @@ dceDataset <- function() {
   
   ##### Specification of dialog box #####
   # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "make.dataset",
+  OKCancelHelp(helpSubject = "ce.dataset",
                reset       = "dceDataset",
                apply       = "dceDataset")
   
@@ -693,7 +604,7 @@ dceDataset <- function() {
   ## Design matrix
   tkgrid(labelRcmdr(
     inputsFrame,
-    text = gettextRcmdr("Name of design matrix")),
+    text = gettextRcmdr("Design")),
     design, sticky = "w")
 
   ## Responses to DCE questions
@@ -702,11 +613,107 @@ dceDataset <- function() {
     text = gettextRcmdr("Responses to DCE questions ")),
     response, sticky = "w")
   
+  ## Opt-out option
+  tkgrid(optoutCheckBox,
+         labelRcmdr(optoutFrame, text = gettextRcmdr("Opt-out option")),
+         sticky = "w")
+  tkgrid(optoutFrame, sticky = "w")
+  
+  ## Blank line
+  tkgrid(labelRcmdr(inputsFrame, text = gettextRcmdr("")), sticky = "w")
+  
+  ## Save data set
+  tkgrid(saveCheckBox,
+         labelRcmdr(saveFrame,
+                    text = gettextRcmdr("Save the resultant data set")),
+         sticky = "w")
+  tkgrid(saveFrame, sticky = "w")
+  
   tkgrid(inputsFrame, sticky = "w")  
   
   # OK Cancel Help Buttons
   tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
 
+  dialogSuffix()
+}
+
+###############################################################################
+
+dceInteract <- function() {
+  initializeDialog(
+    title = 
+      gettextRcmdr("Create Interactions Between Attributes/Levels and Covariates"))
+
+  ##### Input Frame #####
+  inputFrame      <- tkframe(top)
+  attrlvlVarFrame <- tkframe(inputFrame)
+  covariateFrame  <- tkframe(inputFrame)
+  
+  # Attribute/level variables
+  attrlvlVarVec <- eval(parse(text = paste0("attr(", activeDataSet(),
+                                            ", 'independents')")))
+  attrlvlVarBox <- variableListBox(
+    attrlvlVarFrame,
+    attrlvlVarVec,
+    title = "Attribute/level variables \n(pick one or more)",
+    selectmode = "multiple",
+    listHeight = 10)
+  
+  # Covariates
+  covariateVec <- eval(parse(text = paste0("attr(", activeDataSet(),
+                                            ", 'covariates')")))
+  covariateBox <- variableListBox(
+    covariateFrame,
+    covariateVec,
+    title = "Covariates \n(pick one or more)",
+    selectmode = "multiple",
+    listHeight = 10)
+  
+  
+  ##### onOK function #####
+  onOK <- function() {
+    attrlvlVar   <- getSelection(attrlvlVarBox)
+    covariateVar <- getSelection(covariateBox)
+    
+  closeDialog()
+  
+  interactionVars <- NULL
+  for (i in attrlvlVar) {
+    for (j in covariateVar) {
+      doItAndPrint(paste0(activeDataSet(), "$", i, "_", j, " <- ", 
+                          activeDataSet(), "$", i, " * ", 
+                          activeDataSet(), "$", j))
+      interactionVars <- c(interactionVars, paste0(i, j))
+    }
+  }
+  
+  activeDataSet(activeDataSet(),
+                flushModel = FALSE,
+                flushDialogMemory = FALSE)
+
+  tkfocus(CommanderWindow())
+  }
+
+  ##### Specification of dialog box #####
+  # Ok Cancel Help Buttons
+  OKCancelHelp(helpSubject = "ce.dataset",
+               reset       = "dceInteract",
+               apply       = "dceInteract")
+
+  # Attribute/level variabels
+  tkgrid(getFrame(attrlvlVarBox), sticky = "w")
+  
+  # Covariates
+  tkgrid(getFrame(covariateBox), sticky = "w")
+
+  tkgrid(attrlvlVarFrame, labelRcmdr(inputFrame, text = "   "),
+         covariateFrame, sticky = "nw")
+  
+  tkgrid(inputFrame, sticky = "w")
+  
+  # OK Cancel Help Buttons
+  tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
+  
   dialogSuffix()
 }
 
@@ -756,7 +763,7 @@ dceFitmodel <- function() {
   ##### Output Frame #####
   # Name for fitted model
   UpdateModelNumber()
-  modelName  <- tclVar(paste("DCEmodel.", getRcmdr("modelNumber"), sep = ""))
+  modelName  <- tclVar(paste0("DCEmodel.", getRcmdr("modelNumber")))
   modelFrame <- tkframe(top)
   model      <- ttkentry(modelFrame, width = "20", textvariable = modelName)
 
@@ -764,36 +771,44 @@ dceFitmodel <- function() {
   ##### Input Frame #####
   # Response variable
   responseVarFrame <- tkframe(top)
-  responseVarBox <- variableComboBox(
-    responseVarFrame,
-    Variables(),
-    initialSelection = dialog.values$ini.responseVarName,
-    title = "Response variable")
+  responseVarName  <- tclVar(dialog.values$ini.responseVarName)
+  responseVar      <- ttkentry(responseVarFrame, width = "5",
+                               textvariable = responseVarName)
 
-  # Independent variables (Added 0.1-3)
+  # Independent variables
+  indVarVec <- 
+    eval(parse(text = paste0("attr(", activeDataSet(), ", 'independents')")))
+  noncovVarVec <- 
+    eval(parse(text = paste0("attr(", activeDataSet(), ", 'noncovariates')")))
+  covVarVec <- 
+    eval(parse(text = paste0("attr(", activeDataSet(), ", 'covariates')")))
+  currentAllVarVec <- 
+    eval(parse(text = paste0("colnames(", activeDataSet(), ")")))
+  interactionVec <- 
+    currentAllVarVec[!currentAllVarVec %in% c(noncovVarVec, covVarVec)]
+  allIndVarVec <- c(indVarVec, interactionVec)
+
   independentVarFrame <- tkframe(top)
   independentVarBox <- variableListBox(
     independentVarFrame,
-    Variables(),
-    title = "Independent variables (pick one or more)",
+    allIndVarVec,
+    title = "Independent variables \n(pick one or more)",
     selectmode = "multiple",
-    listHeight = 5)
+    listHeight = 10)
 
   # Stratification variable
   strataFrame    <- tkframe(top)
   strataVarFrame <- tkframe(strataFrame)
-  strataVarBox   <- variableComboBox(
-    strataVarFrame,
-    Variables(),
-    initialSelection = dialog.values$ini.strataVarName,
-    title = "Stratification variable")
+  strataVarName  <- tclVar(dialog.values$ini.strataVarName)
+  strataVar      <- ttkentry(strataVarFrame, width = "5",
+                             textvariable = strataVarName)
 
     
   ##### onOK function #####
   onOK <- function () {
 
-    responseVar <- getSelection(responseVarBox)
-    strataVar   <- getSelection(strataVarBox)
+    responseVar <- trim.blanks(tclvalue(responseVarName))
+    strataVar   <- trim.blanks(tclvalue(strataVarName))
     indVar      <- getSelection(independentVarBox)  # Added 0.1-3
     if(length(indVar) == 0) covVar <- "1"           # Added 0.1-3
     
@@ -811,7 +826,7 @@ dceFitmodel <- function() {
       subset <- ""
       putRcmdr("modelWithSubset", FALSE)
     } else {
-      subset <- paste(", subset = ", subset, sep = "")
+      subset <- paste0(", subset = ", subset)
       putRcmdr("modelWithSubset", TRUE)
     }
 
@@ -847,21 +862,20 @@ dceFitmodel <- function() {
   tkgrid(labelRcmdr(top, text = ""))
 
   # Input
-  ## Title
-  tkgrid(labelRcmdr(top, text = gettextRcmdr("Model formula"),
-                    fg = getRcmdr("title.color"), font = "RcmdrTitleFont"),
-         sticky = "w")
-
   ## Response variable
-  tkgrid(getFrame(responseVarBox), sticky = "w") # Modified 0.1-3
+  tkgrid(labelRcmdr(responseVarFrame,
+                    text = gettextRcmdr("Response variable ")),
+         responseVar, sticky = "w")
   tkgrid(responseVarFrame, sticky = "w")
 
   ## Independent variables (Modified 0.1-3)
   tkgrid(getFrame(independentVarBox), sticky = "w")
   tkgrid(independentVarFrame, sticky = "w")
 
-  ## Stratification variable (Modified 0.1-3)
-  tkgrid(getFrame(strataVarBox), sticky = "w")
+  ## Stratification variable
+  tkgrid(labelRcmdr(strataVarFrame,
+                    text = gettextRcmdr("Stratification variable ")),
+         strataVar, sticky = "w")
   tkgrid(strataVarFrame, sticky = "w")
   tkgrid(strataFrame, sticky = "w")
 
@@ -1089,11 +1103,30 @@ dceMwtp <- function() {
 
 ###############################################################################
 
+dceLoad <- function() {
+  file <- 
+    tclvalue(
+      tkgetOpenFile(
+        filetype = 
+          gettextRcmdr(' {"R Data Files" {".rda" ".RDA" ".rdata" ".RData"}}')))
+  if (file == "") {
+    return()
+  }
+  setBusyCursor()
+  on.exit(setIdleCursor())
+
+  doItAndPrint(paste0('load("', file, '")'))
+
+  tkfocus(CommanderWindow())
+}
+
+###############################################################################
+
 clogitP <- function() {
   activeModelP() && class(get(ActiveModel()))[1] == "clogit"
 }
 
 dcedataP <- function() {
-  activeDataSetP() && class(get(ActiveDataSet()))[1] == "dcedataset"
+  activeDataSetP() && class(get(ActiveDataSet()))[1] == "ce.dataset"
 }
 

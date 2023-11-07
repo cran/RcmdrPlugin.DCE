@@ -1,11 +1,12 @@
 # type  menu/item  operation/parent  label                              command/menu        activation         install?
 menu    dceMenu    topMenu           ""                                 ""                  ""                 ""
 item    dceMenu    command           "Design choice sets..."            dceDesign           ""                 "packageAvailable('support.CEs')"
-item    dceMenu    command           "Create questions..."              dceQuestions        ""                 "packageAvailable('support.CEs')"
-item    dceMenu    command           "Create design matrix..."          dceDesignMatrix     ""                 "packageAvailable('support.CEs')"
-item    dceMenu    command           "Import design matrix..."          loadDceDesignMatrix ""                 "packageAvailable('support.CEs')"
+item    dceMenu    command           "Display questions..."             dceQuestions        ""                 "packageAvailable('support.CEs')"
 item    dceMenu    command           "Create data set for analysis..."  dceDataset          "activeDataSetP()" "packageAvailable('support.CEs')"
+item    dceMenu    command           "Create interactions..."           dceInteract         "dcedataP()"       "packageAvailable('support.CEs')"
 item    dceMenu    command           "Fit model..."                     dceFitmodel         "dcedataP()"       "packageAvailable('survival')"
 item    dceMenu    command           "Calculate MWTPs..."               dceMwtp             "clogitP()"        "packageAvailable('support.CEs')"
+item    dceMenu    separator         ""                                 ""                  ""                 ""
+item    dceMenu    command           "Load saved objects..."            dceLoad             ""                 "packageAvailable('support.CEs')"
 item    topMenu    cascade           "DCE"                              dceMenu             ""                 "packageAvailable('support.CEs')"
 

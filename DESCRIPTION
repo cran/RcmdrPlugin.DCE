@@ -1,16 +1,16 @@
 Package: RcmdrPlugin.DCE
 Type: Package
 Title: R Commander Plug-in for Discrete Choice Experiments
-Version: 0.1-3
-Date: 2023-07-04
+Version: 0.2-0
+Date: 2023-11-07
 Author: Hideo Aizaki
 Maintainer: Hideo Aizaki <azk-r@spa.nifty.com>
-Depends: support.CEs, survival
+Depends: support.CEs (>= 0.7-0), survival
 Imports: Rcmdr
 Description: Adds menu items for discrete choice experiments (DCEs) to the R Commander. DCE is a question-based survey method that designs various combinations (profiles) of attribute levels using the experimental designs, asks respondents to select the most preferred profile in each choice set, and then measures preferences for the attribute levels by analyzing the responses. For details on DCEs, refer to Louviere et al. (2000) <doi:10.1017/CBO9780511753831>.
 License: GPL (>= 2)
 RcmdrModels: clogit
 NeedsCompilation: no
-Packaged: 2023-07-04 09:25:44 UTC; rpkgdev
+Packaged: 2023-11-07 10:57:12 UTC; rpkgdev
 Repository: CRAN
-Date/Publication: 2023-07-04 09:50:02 UTC
+Date/Publication: 2023-11-07 12:20:03 UTC
