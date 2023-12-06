@@ -1,5 +1,6 @@
 \docType{package}
 \name{RcmdrPlugin.DCE-package}
+\alias{RcmdrPlugin.DCE-package}
 \alias{RcmdrPlugin.DCE}
 \alias{dceDesign}
 \alias{resetDceTable}

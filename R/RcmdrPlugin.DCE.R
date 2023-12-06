@@ -43,11 +43,18 @@ dceDesign <- function() {
   
   ##### Output Frame #####
   outputFrame <- tkframe(top)
+  designFrame <- tkframe(outputFrame)
+  saveFrame   <- tkframe(outputFrame)
 
   # Choice sets
   designName <- tclVar(dialog.values$designName)
-  design     <- ttkentry(outputFrame, width = "20", 
+  design     <- ttkentry(designFrame, width = "14",
                          textvariable = designName)
+
+  # Save option
+  saveVariable <- tclVar(dialog.values$saveVariable)
+  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
+
 
   ##### Input Frame #####
   inputsFrame       <- tkframe(top)
@@ -59,7 +66,6 @@ dceDesign <- function() {
   tableFrame        <- tkframe(TABLEFrame)
   rightFrame        <- tkframe(TABLEFrame)
   AttrCheckBoxFrame <- tkframe(rightFrame)
-  saveFrame        <- tkframe(inputsFrame)
   
   # Design method
   radioButtons(
@@ -73,19 +79,19 @@ dceDesign <- function() {
   # Number of alternatives per set (without the output option)
   nAlternativesName <- tclVar(dialog.values$nAlternativesName)
   nAlternatives     <- ttkentry(AltBlkRngFrame,
-                                width = "10",
+                                width = "7",
                                 textvariable = nAlternativesName)
   
   # Number of blocks
   nBlocksName <- tclVar(dialog.values$nBlocksName)
   nBlocks     <- ttkentry(AltBlkRngFrame,
-                          width = "10",
+                          width = "7",
                           textvariable = nBlocksName)
 
   # Seed for RNG
   RNGseedName <- tclVar(dialog.values$RNGseedName)
   RNGseed     <- ttkentry(RNGFrame,
-                          width = "10",
+                          width = "7",
                           textvariable = RNGseedName)
 
   # RNG option
@@ -159,9 +165,6 @@ dceDesign <- function() {
   A6Var <- tclVar(dialog.values$A6Var)
   A6CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A6Var)
   
-  # Save option
-  saveVariable <- tclVar(dialog.values$saveVariable)
-  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
   
   ##### onOK Function #####
   onOK <- function() {
@@ -297,7 +300,7 @@ dceDesign <- function() {
                     ', file = "', saveFile, '")')
       justDoIt(cmd)
       logger(cmd)
-      Message(paste0(gettextRcmdr("DCE design exported to file"),
+      Message(paste0(gettextRcmdr("DCE design was exported to file: "),
                      saveFile),
               type = "note")
     }
@@ -311,10 +314,22 @@ dceDesign <- function() {
                reset       = "resetDceTable",
                apply       = "dceDesign")
   # Output
+  ## Design
   tkgrid(
-    labelRcmdr(outputFrame,
+    labelRcmdr(designFrame,
                text = gettextRcmdr("Name for design ")),
     design, sticky = "w")
+
+  ## Save choice sets
+  tkgrid(
+    saveCheckBox,
+      labelRcmdr(
+        saveFrame,
+        text = gettextRcmdr("Save to file")),
+    sticky = "w")
+  
+  tkgrid(designFrame, labelRcmdr(outputFrame, text = "   "),
+         saveFrame, sticky = "w")
   tkgrid(outputFrame, sticky = "w")
 
   # Blank line
@@ -386,18 +401,6 @@ dceDesign <- function() {
     sticky = "w")
   tkgrid(RNGoptionFrame, sticky = "w")
   
-  # Blank line
-  tkgrid(labelRcmdr(inputsFrame, text = ""))
-
-  # Save choice sets
-  tkgrid(
-    saveCheckBox,
-      labelRcmdr(
-        saveFrame,
-        text = gettextRcmdr("Save the resultant choice sets")),
-    sticky = "w")
-  tkgrid(saveFrame, sticky = "w")
-    
   tkgrid(inputsFrame, sticky = "w")
 
   # OK Cancel Help Buttons
@@ -425,7 +428,7 @@ dceQuestions <- function() {
 
   # Choice sets
   designName <- tclVar(dialog.values$designName)
-  design <- ttkentry(inputsFrame, width = "20",
+  design <- ttkentry(inputsFrame, width = "14",
                      textvariable = designName)
 
   ##### onOK Function #####
@@ -478,22 +481,26 @@ dceDataset <- function() {
   ##### Output Frame #####
   outputFrame      <- tkframe(top)
   datasetnameFrame <- tkframe(outputFrame)
+  saveFrame        <- tkframe(outputFrame)
 
   # output name
   datasetName <- tclVar(dialog.values$datasetName)
-  dataset     <- ttkentry(datasetnameFrame, width = "20", 
+  dataset     <- ttkentry(datasetnameFrame, width = "14", 
                           textvariable = datasetName)
   
+  # save option
+  saveVariable <- tclVar(dialog.values$saveVariable)
+  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
+
 
   ##### Input Frame #####
   inputsFrame <- tkframe(top)
   tableFrame  <- tkframe(inputsFrame)
   optoutFrame <- tkframe(inputsFrame)
-  saveFrame   <- tkframe(inputsFrame)
   
   # choice sets
   designName <- tclVar(dialog.values$designName)
-  design <- ttkentry(inputsFrame, width = "20",
+  design <- ttkentry(inputsFrame, width = "14",
                      textvariable = designName)
   
   # response variables
@@ -504,10 +511,6 @@ dceDataset <- function() {
   # opt-out option
   optoutVariable <- tclVar(dialog.values$optoutVariable)
   optoutCheckBox <- ttkcheckbutton(optoutFrame, variable = optoutVariable)
-  
-  # save option
-  saveVariable <- tclVar(dialog.values$saveVariable)
-  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
   
 
   ##### onOK function #####
@@ -573,7 +576,7 @@ dceDataset <- function() {
       logger(cmd)
       Message(
         paste0(
-          gettextRcmdr("DCE data set for analysis exported to file"),
+          gettextRcmdr("DCE data set for analysis was exported to file: "),
           saveFile),
         type = "note")
     }
@@ -590,11 +593,20 @@ dceDataset <- function() {
                apply       = "dceDataset")
   
   # Output
+  ## data set
   tkgrid(
     labelRcmdr(datasetnameFrame,
                text = gettextRcmdr("Name for data set ")),
     dataset, sticky = "w")
-  tkgrid(datasetnameFrame, sticky = "w")
+
+  ## Save data set
+  tkgrid(saveCheckBox,
+         labelRcmdr(saveFrame,
+                    text = gettextRcmdr("Save to file")),
+         sticky = "w")
+
+  tkgrid(datasetnameFrame, labelRcmdr(outputFrame, text = "   "),
+         saveFrame, sticky = "w")
   tkgrid(outputFrame, sticky = "w")
   
   # Blank line
@@ -618,17 +630,7 @@ dceDataset <- function() {
          labelRcmdr(optoutFrame, text = gettextRcmdr("Opt-out option")),
          sticky = "w")
   tkgrid(optoutFrame, sticky = "w")
-  
-  ## Blank line
-  tkgrid(labelRcmdr(inputsFrame, text = gettextRcmdr("")), sticky = "w")
-  
-  ## Save data set
-  tkgrid(saveCheckBox,
-         labelRcmdr(saveFrame,
-                    text = gettextRcmdr("Save the resultant data set")),
-         sticky = "w")
-  tkgrid(saveFrame, sticky = "w")
-  
+
   tkgrid(inputsFrame, sticky = "w")  
   
   # OK Cancel Help Buttons
@@ -765,7 +767,7 @@ dceFitmodel <- function() {
   UpdateModelNumber()
   modelName  <- tclVar(paste0("DCEmodel.", getRcmdr("modelNumber")))
   modelFrame <- tkframe(top)
-  model      <- ttkentry(modelFrame, width = "20", textvariable = modelName)
+  model      <- ttkentry(modelFrame, width = "14", textvariable = modelName)
 
   
   ##### Input Frame #####
@@ -865,7 +867,10 @@ dceFitmodel <- function() {
   ## Response variable
   tkgrid(labelRcmdr(responseVarFrame,
                     text = gettextRcmdr("Response variable ")),
-         responseVar, sticky = "w")
+         labelRcmdr(responseVarFrame,
+                    text = tclvalue(responseVarName),
+                    relief = "solid", foreground = "green"),
+         sticky = "w")
   tkgrid(responseVarFrame, sticky = "w")
 
   ## Independent variables (Modified 0.1-3)
@@ -875,7 +880,10 @@ dceFitmodel <- function() {
   ## Stratification variable
   tkgrid(labelRcmdr(strataVarFrame,
                     text = gettextRcmdr("Stratification variable ")),
-         strataVar, sticky = "w")
+         labelRcmdr(strataVarFrame,
+                    text = tclvalue(strataVarName),
+                    relief = "solid", foreground = "green"),
+         sticky = "w")
   tkgrid(strataVarFrame, sticky = "w")
   tkgrid(strataFrame, sticky = "w")
 
@@ -926,7 +934,8 @@ dceMwtp <- function() {
   # output
   outputFrame <- tkframe(top)
   outputName  <- tclVar(dialog.values$outputName)
-  output      <- ttkentry(outputFrame, width = "20", textvariable = outputName)
+  output      <- ttkentry(outputFrame, width = "14",
+                         textvariable = outputName)
   
   
   ##### Input Frame #####
@@ -965,16 +974,16 @@ dceMwtp <- function() {
   
   ## Confidence level
   confLevelName <- tclVar(dialog.values$confLevelName)
-  confLevel     <- ttkentry(clFrame, width = "6",
+  confLevel     <- ttkentry(clFrame, width = "7",
                             textvariable = confLevelName)
 
   NdrawsValue   <- tclVar(dialog.values$NdrawsValue)
-  Ndraws        <- ttkentry(optionsKRFrame, width = "6",
+  Ndraws        <- ttkentry(optionsKRFrame, width = "7",
                             textvariable = NdrawsValue)
   
   ## Random number generator seed
   RNGseedName <- tclVar(dialog.values$RNGseedName)
-  RNGseed     <- ttkentry(optionsKRFrame, width = "10",
+  RNGseed     <- ttkentry(optionsKRFrame, width = "7",
                           textvariable = RNGseedName)
   
   
