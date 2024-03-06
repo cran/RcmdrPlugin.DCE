@@ -310,7 +310,7 @@ dceDesign <- function() {
 
   ##### Specification of dialog box #####
   # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "rotation.design",
+  OKCancelHelp(helpSubject = "dceDesign",
                reset       = "resetDceTable",
                apply       = "dceDesign")
   # Output
@@ -448,7 +448,7 @@ dceQuestions <- function() {
   
   ##### Specification of dialog box #####
   # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "questionnaire",
+  OKCancelHelp(helpSubject = "dceQuestions",
                reset       = "dceQuestions",
                apply       = NULL)
 
@@ -468,7 +468,7 @@ dceQuestions <- function() {
 ###############################################################################
 
 dceDataset <- function() {
-  initializeDialog(title = gettextRcmdr("Create Data Set for Analysis"))
+  initializeDialog(title = gettextRcmdr("Create Data Set for DCE Analysis"))
   defaults <- list(
     datasetName  = "DCEdata",
     designName   = "DCEdesign",
@@ -588,7 +588,7 @@ dceDataset <- function() {
   
   ##### Specification of dialog box #####
   # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "ce.dataset",
+  OKCancelHelp(helpSubject = "dceDataset",
                reset       = "dceDataset",
                apply       = "dceDataset")
   
@@ -641,10 +641,10 @@ dceDataset <- function() {
 
 ###############################################################################
 
-dceInteract <- function() {
+dceInteractions <- function() {
   initializeDialog(
     title = 
-      gettextRcmdr("Create Interactions Between Attributes/Levels and Covariates"))
+      gettextRcmdr("Create Interactions between Attributes/Levels and Covariates"))
 
   ##### Input Frame #####
   inputFrame      <- tkframe(top)
@@ -698,9 +698,9 @@ dceInteract <- function() {
 
   ##### Specification of dialog box #####
   # Ok Cancel Help Buttons
-  OKCancelHelp(helpSubject = "ce.dataset",
-               reset       = "dceInteract",
-               apply       = "dceInteract")
+  OKCancelHelp(helpSubject = "dceInteractions",
+               reset       = "dceInteractions",
+               apply       = "dceInteractions")
 
   # Attribute/level variabels
   tkgrid(getFrame(attrlvlVarBox), sticky = "w")
@@ -721,12 +721,12 @@ dceInteract <- function() {
 
 ###############################################################################
 
-dceFitmodel <- function() {
-  initializeDialog(title = gettextRcmdr("Fit Conditional Logit Model"))
+dceModel <- function() {
+  initializeDialog(title = gettextRcmdr("Fit Model to DCE Data"))
   defaults <- list(
     ini.responseVarName = "RES",
     ini.strataVarName   = "STR")
-  dialog.values <- getDialog("dceFitmodel", defaults)
+  dialog.values <- getDialog("dceModel", defaults)
 
   if (!any(Variables() == dialog.values$ini.responseVarName)) {
     dialog.values$ini.responseVarName = gettextRcmdr("<no variable selected>")
@@ -814,7 +814,7 @@ dceFitmodel <- function() {
     indVar      <- getSelection(independentVarBox)  # Added 0.1-3
     if(length(indVar) == 0) covVar <- "1"           # Added 0.1-3
     
-    putDialog("dceFitmodel", list(
+    putDialog("dceModel", list(
       ini.responseVarName = responseVar,
       ini.strataVarName   = strataVar))
     
@@ -850,10 +850,10 @@ dceFitmodel <- function() {
   
   ##### Specification of dialog box #####
   # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "clogit",
+  OKCancelHelp(helpSubject = "dceModel",
                model       = TRUE,
                reset       = "resetDceModel",
-               apply       = "dceFitmodel")
+               apply       = "dceModel")
 
   # Output
   tkgrid(labelRcmdr(modelFrame, text = gettextRcmdr("Name for model ")),
@@ -902,16 +902,16 @@ dceFitmodel <- function() {
 
 resetDceModel <- function(){
   putRcmdr("reset.model", TRUE)
-  putDialog("dceFitmodel", NULL)
-  putDialog("dceFitmodel", NULL, resettable = FALSE)
-  dceFitmodel()
+  putDialog("dceModel", NULL)
+  putDialog("dceModel", NULL, resettable = FALSE)
+  dceModel()
 }
 
 ###############################################################################
 
 dceMwtp <- function() {
   initializeDialog(
-    title = gettextRcmdr("Calculate Marginal Willingness To Pays"))
+    title = gettextRcmdr("Calculate Marginal Willingness to Pay"))
   defaults <- list(
     outputName    = "MWTP",
     moneyName     = gettextRcmdr("<no variable selected>"),
@@ -1050,7 +1050,7 @@ dceMwtp <- function() {
   
   ##### Specification of dialog box #####
   # Ok Cancel Help Buttons 
-  OKCancelHelp(helpSubject = "mwtp",
+  OKCancelHelp(helpSubject = "dceMwtp",
                reset       = "dceMwtp",
                apply       = "dceMwtp")
 
@@ -1124,7 +1124,12 @@ dceLoad <- function() {
   setBusyCursor()
   on.exit(setIdleCursor())
 
-  doItAndPrint(paste0('load("', file, '")'))
+  cmd <- paste0('load("', file, '")')
+  loadedObject <- justDoIt(cmd)
+  logger(cmd)
+  Message(paste0(gettextRcmdr("Name of loaded object: "),
+          paste(loadedObject, collapse = ", ")),
+          type = "note")
 
   tkfocus(CommanderWindow())
 }
@@ -1135,7 +1140,7 @@ clogitP <- function() {
   activeModelP() && class(get(ActiveModel()))[1] == "clogit"
 }
 
-dcedataP <- function() {
+dceDataP <- function() {
   activeDataSetP() && class(get(ActiveDataSet()))[1] == "ce.dataset"
 }
 

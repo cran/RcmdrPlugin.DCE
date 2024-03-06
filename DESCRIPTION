@@ -1,8 +1,8 @@
 Package: RcmdrPlugin.DCE
 Type: Package
 Title: R Commander Plug-in for Discrete Choice Experiments
-Version: 0.2-1
-Date: 2023-12-06
+Version: 0.2-2
+Date: 2024-03-06
 Author: Hideo Aizaki
 Maintainer: Hideo Aizaki <azk-r@spa.nifty.com>
 Depends: support.CEs (>= 0.7-0), survival
@@ -11,6 +11,6 @@ Description: Adds menu items for discrete choice experiments (DCEs) to the R Com
 License: GPL (>= 2)
 RcmdrModels: clogit
 NeedsCompilation: no
-Packaged: 2023-12-06 03:59:44 UTC; rpkgdev
+Packaged: 2024-03-06 04:56:07 UTC; rpkgdev
 Repository: CRAN
-Date/Publication: 2023-12-06 05:50:02 UTC
+Date/Publication: 2024-03-06 05:10:02 UTC

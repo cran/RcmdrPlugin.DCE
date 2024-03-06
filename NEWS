@@ -1,5 +1,10 @@
 Changes to package RcmdrPlugin.DCE
 
+2024-03-06, version 0.2-2
+- Added help files.
+- Modified appearances of dialog boxes.
+- Modified function names.
+
 2023-12-06, version 0.2-1
 - Modified dialog boxes for designing choice sets, creating data set, and fitting model.
 
