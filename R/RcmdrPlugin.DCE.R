@@ -25,21 +25,22 @@
 dceDesign <- function() {
   initializeDialog(title = gettextRcmdr("Design Choice Sets for DCE"))
   defaults <- list(
-    designName = "DCEdesign",
-    designMethod = "FALSE",
-    nAlternativesName = "2",
-    nBlocksName = "1",
-    RNGseedName = "",
-    RNGoptionVariable = "0",
-    A1Var = "0",
-    A2Var = "0",
-    A3Var = "0",
-    A4Var = "0",
-    A5Var = "0",
-    A6Var = "0",
-    saveVariable = "0")
+    ini.designName = "DCEdesign",
+    ini.designMethod = "FALSE",
+    ini.nAlternativesName = "2",
+    ini.nBlocksName = "1",
+    ini.RNGseedName = "",
+    ini.RNGoptionVariable = "0",
+    ini.A1Var = "0",
+    ini.A2Var = "0",
+    ini.A3Var = "0",
+    ini.A4Var = "0",
+    ini.A5Var = "0",
+    ini.A6Var = "0",
+    ini.saveVariable = "0")
   dialog.values <- getDialog("dceDesign", defaults)
 
+  if(is.null(getDialog("dceDesign"))) putRcmdr("savedTableDceDesign", NULL)
   
   ##### Output Frame #####
   outputFrame <- tkframe(top)
@@ -47,12 +48,12 @@ dceDesign <- function() {
   saveFrame   <- tkframe(outputFrame)
 
   # Choice sets
-  designName <- tclVar(dialog.values$designName)
+  designName <- tclVar(dialog.values$ini.designName)
   design     <- ttkentry(designFrame, width = "14",
                          textvariable = designName)
 
   # Save option
-  saveVariable <- tclVar(dialog.values$saveVariable)
+  saveVariable <- tclVar(dialog.values$ini.saveVariable)
   saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
 
 
@@ -73,29 +74,29 @@ dceDesign <- function() {
     name = "designmethod",
     buttons = c("FALSE", "TRUE"),
     labels = gettextRcmdr(c("Rotation", "Mix-and-Match")),
-    initialValue = dialog.values$designMethod,
+    initialValue = dialog.values$ini.designMethod,
     title = gettextRcmdr("Design method"))
 
   # Number of alternatives per set (without the output option)
-  nAlternativesName <- tclVar(dialog.values$nAlternativesName)
+  nAlternativesName <- tclVar(dialog.values$ini.nAlternativesName)
   nAlternatives     <- ttkentry(AltBlkRngFrame,
                                 width = "7",
                                 textvariable = nAlternativesName)
   
   # Number of blocks
-  nBlocksName <- tclVar(dialog.values$nBlocksName)
+  nBlocksName <- tclVar(dialog.values$ini.nBlocksName)
   nBlocks     <- ttkentry(AltBlkRngFrame,
                           width = "7",
                           textvariable = nBlocksName)
 
   # Seed for RNG
-  RNGseedName <- tclVar(dialog.values$RNGseedName)
+  RNGseedName <- tclVar(dialog.values$ini.RNGseedName)
   RNGseed     <- ttkentry(RNGFrame,
                           width = "7",
                           textvariable = RNGseedName)
 
   # RNG option
-  RNGoptionVariable <- tclVar(dialog.values$RNGoptionVariable)
+  RNGoptionVariable <- tclVar(dialog.values$ini.RNGoptionVariable)
   RNGoptionCheckBox <- ttkcheckbutton(RNGoptionFrame,
                                       variable = RNGoptionVariable)
 
@@ -108,7 +109,7 @@ dceDesign <- function() {
   nrows <- 6
   ncols <- 7
 
-  initial.table <- getRcmdr("savedTable")
+  initial.table <- getRcmdr("savedTableDceDesign")
   
   ## Names of columns
   make.col.names <- "labelRcmdr(.tableFrame, text='')"
@@ -152,17 +153,17 @@ dceDesign <- function() {
   tkgrid(get(".tableFrame", envir = env), sticky = "w")
 
   # Quantitative attributes
-  A1Var <- tclVar(dialog.values$A1Var)
+  A1Var <- tclVar(dialog.values$ini.A1Var)
   A1CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A1Var)
-  A2Var <- tclVar(dialog.values$A2Var)
+  A2Var <- tclVar(dialog.values$ini.A2Var)
   A2CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A2Var)
-  A3Var <- tclVar(dialog.values$A3Var)
+  A3Var <- tclVar(dialog.values$ini.A3Var)
   A3CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A3Var)
-  A4Var <- tclVar(dialog.values$A4Var)
+  A4Var <- tclVar(dialog.values$ini.A4Var)
   A4CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A4Var)
-  A5Var <- tclVar(dialog.values$A5Var)
+  A5Var <- tclVar(dialog.values$ini.A5Var)
   A5CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A5Var)
-  A6Var <- tclVar(dialog.values$A6Var)
+  A6Var <- tclVar(dialog.values$ini.A6Var)
   A6CheckBox <- ttkcheckbutton(AttrCheckBoxFrame, variable = A6Var)
   
   
@@ -170,19 +171,19 @@ dceDesign <- function() {
   onOK <- function() {
 
     putDialog("dceDesign", list(
-      designName = tclvalue(designName),
-      designMethod = tclvalue(designmethodVariable),
-      nAlternativesName = tclvalue(nAlternativesName),
-      nBlocksName = tclvalue(nBlocksName),
-      RNGseedName = tclvalue(RNGseedName),
-      RNGoptionVariable = tclvalue(RNGoptionVariable),
-      A1Var = tclvalue(A1Var),
-      A2Var = tclvalue(A2Var),
-      A3Var = tclvalue(A3Var),
-      A4Var = tclvalue(A4Var),
-      A5Var = tclvalue(A5Var),
-      A6Var = tclvalue(A6Var),
-      saveVariable = tclvalue(saveVariable)))
+      ini.designName = tclvalue(designName),
+      ini.designMethod = tclvalue(designmethodVariable),
+      ini.nAlternativesName = tclvalue(nAlternativesName),
+      ini.nBlocksName = tclvalue(nBlocksName),
+      ini.RNGseedName = tclvalue(RNGseedName),
+      ini.RNGoptionVariable = tclvalue(RNGoptionVariable),
+      ini.A1Var = tclvalue(A1Var),
+      ini.A2Var = tclvalue(A2Var),
+      ini.A3Var = tclvalue(A3Var),
+      ini.A4Var = tclvalue(A4Var),
+      ini.A5Var = tclvalue(A5Var),
+      ini.A6Var = tclvalue(A6Var),
+      ini.saveVariable = tclvalue(saveVariable)))
     
     closeDialog()
 
@@ -201,7 +202,7 @@ dceDesign <- function() {
     }
 
     # Store the table of attributes and levels into savedTable 
-    putRcmdr("savedTable", varNames) 
+    putRcmdr("savedTableDceDesign", varNames) 
     
     # Variables for attributes and levels
     attributeNames <- varNames[, 1]
@@ -276,10 +277,10 @@ dceDesign <- function() {
             ", nblocks = ", tclvalue(nBlocksName),
             ", randomize = ", tclvalue(designmethodVariable),
             cmd.seed, sep = ""))
-    doItAndPrint(
+    justDoIt(
       paste("attributes(", tclvalue(designName), ")$contA <- ", cmd.contA,
             sep = ""))
-    doItAndPrint(
+    justDoIt(
       paste("attributes(", tclvalue(designName), ")$cateA <- ", cmd.cateA,
             sep = ""))
     doItAndPrint(paste(tclvalue(designName)))
@@ -410,7 +411,7 @@ dceDesign <- function() {
 }
 
 resetDceTable <- function() {
-  putRcmdr("savedTable", NULL)
+  putRcmdr("savedTableDceDesign", NULL)
   putDialog("dceDesign", NULL)
   dceDesign()
 }
@@ -470,11 +471,11 @@ dceQuestions <- function() {
 dceDataset <- function() {
   initializeDialog(title = gettextRcmdr("Create Data Set for DCE Analysis"))
   defaults <- list(
-    datasetName  = "DCEdata",
-    designName   = "DCEdesign",
-    responseName = "",
-    optoutVariable = "0",
-    saveVariable = "0")
+    ini.datasetName  = "DCEdata",
+    ini.designName   = "DCEdesign",
+    ini.responseName = "",
+    ini.optoutVariable = "0",
+    ini.saveVariable = "0")
   dialog.values <- getDialog("dceDataset", defaults)
   
   
@@ -484,12 +485,12 @@ dceDataset <- function() {
   saveFrame        <- tkframe(outputFrame)
 
   # output name
-  datasetName <- tclVar(dialog.values$datasetName)
+  datasetName <- tclVar(dialog.values$ini.datasetName)
   dataset     <- ttkentry(datasetnameFrame, width = "14", 
                           textvariable = datasetName)
   
   # save option
-  saveVariable <- tclVar(dialog.values$saveVariable)
+  saveVariable <- tclVar(dialog.values$ini.saveVariable)
   saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
 
 
@@ -499,17 +500,17 @@ dceDataset <- function() {
   optoutFrame <- tkframe(inputsFrame)
   
   # choice sets
-  designName <- tclVar(dialog.values$designName)
+  designName <- tclVar(dialog.values$ini.designName)
   design <- ttkentry(inputsFrame, width = "14",
                      textvariable = designName)
   
   # response variables
-  responseName <- tclVar(dialog.values$responseName)
+  responseName <- tclVar(dialog.values$ini.responseName)
   response <- ttkentry(inputsFrame, width = "40",
                          textvariable = responseName)
   
   # opt-out option
-  optoutVariable <- tclVar(dialog.values$optoutVariable)
+  optoutVariable <- tclVar(dialog.values$ini.optoutVariable)
   optoutCheckBox <- ttkcheckbutton(optoutFrame, variable = optoutVariable)
   
 
@@ -517,11 +518,11 @@ dceDataset <- function() {
   onOK <- function() {
 
     putDialog("dceDataset", list(
-      datasetName    = tclvalue(datasetName),
-      designName     = tclvalue(designName),
-      responseName   = tclvalue(responseName),
-      optoutVariable = tclvalue(optoutVariable),
-      saveVariable   = tclvalue(saveVariable)))
+      ini.datasetName    = tclvalue(datasetName),
+      ini.designName     = tclvalue(designName),
+      ini.responseName   = tclvalue(responseName),
+      ini.optoutVariable = tclvalue(optoutVariable),
+      ini.saveVariable   = tclvalue(saveVariable)))
     
     cateA <- eval(parse(text = paste0("attr(", tclvalue(designName),
                                       ", 'cateA')")))
@@ -646,6 +647,13 @@ dceInteractions <- function() {
     title = 
       gettextRcmdr("Create Interactions between Attributes/Levels and Covariates"))
 
+  defaults <- list(
+    ini.attrlvlVar   = NULL,
+    ini.covariateVar = NULL)
+
+  dialog.values <- getDialog("dceInteractions", defaults)
+
+
   ##### Input Frame #####
   inputFrame      <- tkframe(top)
   attrlvlVarFrame <- tkframe(inputFrame)
@@ -659,7 +667,9 @@ dceInteractions <- function() {
     attrlvlVarVec,
     title = "Attribute/level variables \n(pick one or more)",
     selectmode = "multiple",
-    listHeight = 10)
+    listHeight = 10,
+    initialSelection = varPosn(dialog.values$ini.attrlvlVar,
+                               vars = attrlvlVarVec))
   
   # Covariates
   covariateVec <- eval(parse(text = paste0("attr(", activeDataSet(),
@@ -669,13 +679,19 @@ dceInteractions <- function() {
     covariateVec,
     title = "Covariates \n(pick one or more)",
     selectmode = "multiple",
-    listHeight = 10)
+    listHeight = 10,
+    initialSelection = varPosn(dialog.values$ini.covariateVar,
+                               vars = covariateVec))
   
   
   ##### onOK function #####
   onOK <- function() {
     attrlvlVar   <- getSelection(attrlvlVarBox)
     covariateVar <- getSelection(covariateBox)
+    
+    putDialog("dceInteractions", list(
+      ini.attrlvlVar   = attrlvlVar,
+      ini.covariateVar = covariateVar))
     
   closeDialog()
   
@@ -724,8 +740,9 @@ dceInteractions <- function() {
 dceModel <- function() {
   initializeDialog(title = gettextRcmdr("Fit Model to DCE Data"))
   defaults <- list(
-    ini.responseVarName = "RES",
-    ini.strataVarName   = "STR")
+    ini.responseVarName    = "RES",
+    ini.independentVarName = NULL,
+    ini.strataVarName      = "STR")
   dialog.values <- getDialog("dceModel", defaults)
 
   if (!any(Variables() == dialog.values$ini.responseVarName)) {
@@ -796,7 +813,9 @@ dceModel <- function() {
     allIndVarVec,
     title = "Independent variables \n(pick one or more)",
     selectmode = "multiple",
-    listHeight = 10)
+    listHeight = 10,
+    initialSelection = varPosn(dialog.values$ini.independentVarName,
+                               vars = allIndVarVec))
 
   # Stratification variable
   strataFrame    <- tkframe(top)
@@ -815,8 +834,9 @@ dceModel <- function() {
     if(length(indVar) == 0) covVar <- "1"           # Added 0.1-3
     
     putDialog("dceModel", list(
-      ini.responseVarName = responseVar,
-      ini.strataVarName   = strataVar))
+      ini.responseVarName    = responseVar,
+      ini.independentVarName = indVar,
+      ini.strataVarName      = strataVar))
     
     modelValue  <- trim.blanks(tclvalue(modelName))
 
@@ -1136,8 +1156,10 @@ dceLoad <- function() {
 
 ###############################################################################
 
-clogitP <- function() {
-  activeModelP() && class(get(ActiveModel()))[1] == "clogit"
+dceClogitP <- function() {
+  activeModelP() && 
+  class(get(ActiveModel()))[1] == "clogit" && 
+  class(get(ActiveDataSet()))[1] == "ce.dataset"
 }
 
 dceDataP <- function() {

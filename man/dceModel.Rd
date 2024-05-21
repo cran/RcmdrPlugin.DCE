@@ -1,7 +1,7 @@
 \name{dceModel}
 \alias{dceModel}
 \alias{resetDceModel}
-\alias{clogitP}
+\alias{dceClogitP}
 
 \title{Fit Model to DCE Data}
 

@@ -5,7 +5,7 @@ item    dceMenu    command           "Display questions..."             dceQuest
 item    dceMenu    command           "Create data set for analysis..."  dceDataset          "activeDataSetP()" "packageAvailable('support.CEs')"
 item    dceMenu    command           "Create interactions..."           dceInteractions     "dceDataP()"       "packageAvailable('support.CEs')"
 item    dceMenu    command           "Fit model..."                     dceModel            "dceDataP()"       "packageAvailable('survival')"
-item    dceMenu    command           "Calculate MWTP..."                dceMwtp             "clogitP()"        "packageAvailable('support.CEs')"
+item    dceMenu    command           "Calculate MWTP..."                dceMwtp             "dceClogitP()"     "packageAvailable('support.CEs')"
 item    dceMenu    separator         ""                                 ""                  ""                 ""
 item    dceMenu    command           "Load saved objects..."            dceLoad             ""                 "packageAvailable('support.CEs')"
 item    topMenu    cascade           "DCE"                              dceMenu             ""                 "packageAvailable('support.CEs')"

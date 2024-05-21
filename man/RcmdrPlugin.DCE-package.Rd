@@ -24,6 +24,7 @@ It depends on \pkg{\link{support.CEs}} (Aizaki 2012),
 Refer to Aizaki (2012), Aizaki et al. (2014), and 
 \sQuote{Non-Market Valuation with R} <\url{http://lab.agr.hokudai.ac.jp/nmvr/}> 
 for a brief introduction to DCEs in R.
+A manual for this package is available at <\url{https://sites.google.com/view/r4sp/rcmdrplugin}>.
 
 After successfully installing and loading \pkg{RcmdrPlugin.DCE}, 
 the R Commander window will appear, and then you will find \sQuote{\code{DCE}} 
