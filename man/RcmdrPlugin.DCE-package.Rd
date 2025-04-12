@@ -18,11 +18,11 @@ For details on DCEs, refer to Louviere et al. (2000).
 
 \details{
 This package is an R Commander plug-in package for DCEs. 
-It depends on \pkg{\link{support.CEs}} (Aizaki 2012), 
+It depends on \pkg{support.CEs} (Aizaki 2012), 
 \pkg{survival} (Therneau 2020; Therneau and Grambsch 2000), and 
-\pkg{\link{Rcmdr}} (Fox 2005, 2017; Fox and Bouchet-Valat 2020). 
+\pkg{Rcmdr} (Fox 2005, 2017; Fox and Bouchet-Valat 2020). 
 Refer to Aizaki (2012), Aizaki et al. (2014), and 
-\sQuote{Non-Market Valuation with R} <\url{http://lab.agr.hokudai.ac.jp/nmvr/}> 
+\sQuote{Non-Market Valuation with R} <\url{https://nmvr.skr.jp/}> 
 for a brief introduction to DCEs in R.
 A manual for this package is available at <\url{https://sites.google.com/view/r4sp/rcmdrplugin}>.
 
@@ -38,18 +38,18 @@ provided by \pkg{RcmdrPlugin.DCE}:
    \item The dialog box for \sQuote{\code{Design choice sets...}} designs 
 choice sets for DCE with the rotation design method or mix-and-match method 
 using the function \code{\link[support.CEs]{rotation.design}} 
-in \pkg{\link{support.CEs}}.
+in \pkg{support.CEs}.
 
    \item The dialog box for \sQuote{\code{Display questions...}} 
 shows DCE questions from the choice sets designed in the first dialog box 
 using the function \code{\link[support.CEs]{questionnaire}} in 
-\pkg{\link{support.CEs}}.
+\pkg{support.CEs}.
 
    \item The dialog box for \sQuote{\code{Create data set for analysis...}} 
 creates a data set for DCE analysis from the choice sets designed in the first 
 dialog box and a data set containing responses to DCE questions using 
 the function \code{\link[support.CEs]{ce.dataset}} 
-in \pkg{\link{support.CEs}}. The menu item is activated if a data frame is 
+in \pkg{support.CEs}. The menu item is activated if a data frame is 
 selected as the active data set.
 
    \item The dialog box for \sQuote{\code{Create interactions...}} creates 
@@ -61,21 +61,21 @@ the active data set.
    \item The dialog box for \sQuote{\code{Fit model...}} implements 
 a conditional logit model analysis of the data set for analysis using 
 the functions \code{\link[survival]{clogit}} in \pkg{survival} and 
-\code{\link[support.CEs]{gofm}} in \pkg{\link{support.CEs}}. 
+\code{\link[support.CEs]{gofm}} in \pkg{support.CEs}. 
 The menu item is activated if the data set for DCE analysis created in 
 the previous dialog box is selected as the active data set.
 
    \item The dialog box for \sQuote{\code{Calculate MWTP...}} 
 calculates marginal willingness to pays (MWTPs) of nonmonetary variables 
 from the model fitted in the previous dialog box using the function 
-\code{\link[support.CEs]{mwtp}} in \pkg{\link{support.CEs}}. The menu item 
+\code{\link[support.CEs]{mwtp}} in \pkg{support.CEs}. The menu item 
 is activated if the fitted model is selected as the active model.
 
    \item The dialog box for \sQuote{\code{Load saved objects...}} loads 
 an R Data file saved in the dialog box for 
 \sQuote{\code{Design choice sets...}} or 
 \sQuote{\code{Create data set for analysis...}}
-using the function \code{\link[base]{load}} in \pkg{\link{base}}. 
+using the function \code{\link[base]{load}} in \pkg{base}. 
 }
 }
 
@@ -106,11 +106,10 @@ Fox J (2005) The R Commander: A Basic Statistics Graphical User Interface to R.
 
 Fox J (2017) \emph{Using the R Commander: A Point-and-Click Interface for R}.
 Chapman and Hall/CRC. 
-\url{https://socialsciences.mcmaster.ca/jfox/Books/RCommander/}
 
 Fox J, Bouchet-Valat M (2020) Rcmdr: R Commander.
 R package version 2.7-1.
-\url{https://socialsciences.mcmaster.ca/jfox/Misc/Rcmdr/}.
+\url{https://cran.r-project.org/package=Rcmdr}.
 
 Louviere JJ, Hensher DA, Swait JD (2000) \emph{Stated Choice Methods: Analysis and Application}.
 Cambridge University Press.

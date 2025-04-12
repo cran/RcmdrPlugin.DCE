@@ -2,6 +2,7 @@
 menu    dceMenu    topMenu           ""                                 ""                  ""                 ""
 item    dceMenu    command           "Design choice sets..."            dceDesign           ""                 "packageAvailable('support.CEs')"
 item    dceMenu    command           "Display questions..."             dceQuestions        ""                 "packageAvailable('support.CEs')"
+item    dceMenu    command           "Collect responses..."             dceResponseSet      ""                 "packageAvailable('support.CEs')"
 item    dceMenu    command           "Create data set for analysis..."  dceDataset          "activeDataSetP()" "packageAvailable('support.CEs')"
 item    dceMenu    command           "Create interactions..."           dceInteractions     "dceDataP()"       "packageAvailable('support.CEs')"
 item    dceMenu    command           "Fit model..."                     dceModel            "dceDataP()"       "packageAvailable('survival')"

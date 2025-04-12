@@ -4,14 +4,14 @@ bibentry(
   bibtype = "Manual",
   title   = "{RcmdrPlugin.DCE: R Commander Plug-in for Discrete Choice Experiments}",
   author  = c(person("Hideo", "Aizaki")),
-  year    = 2023,
-  note    = "R package version 0.2-1",
+  year    = 2025,
+  note    = "R package version 0.2-5",
   url     = "https://CRAN.R-project.org/package=RcmdrPlugin.DCE",
 
   textVersion = 
-  paste("Aizaki H (2023).",
+  paste("Aizaki H (2025).",
         "RcmdrPlugin.DCE: R Commander Plug-in for Discrete Choice Experiments.",
-        "R package version 0.2-1.",
+        "R package version 0.2-5.",
         "URL https://CRAN.R-project.org/package=RcmdrPlugin.DCE.")
 )
 

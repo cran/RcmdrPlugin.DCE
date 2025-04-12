@@ -1136,7 +1136,7 @@ dceLoad <- function() {
   file <- 
     tclvalue(
       tkgetOpenFile(
-        filetype = 
+        filetypes = 
           gettextRcmdr(' {"R Data Files" {".rda" ".RDA" ".rdata" ".RData"}}')))
   if (file == "") {
     return()
@@ -1164,5 +1164,337 @@ dceClogitP <- function() {
 
 dceDataP <- function() {
   activeDataSetP() && class(get(ActiveDataSet()))[1] == "ce.dataset"
+}
+
+###############################################################################
+
+dceResponseSet <- function(){
+  initializeDialog(title = gettextRcmdr("Set Options for Response Collection"))
+  defaults <- list(designName      = "DCEdesign",
+                   ini.noneofthese = "1",
+                   saveVariable    ="1")
+  dialog.values = getDialog("dceResponseSet", defaults)
+  
+  ##### Input Frame #####
+  inputsFrame <- tkframe(top)
+  designFrame <- tkframe(inputsFrame)
+  noneFrame   <- tkframe(inputsFrame)
+  blockFrame  <- tkframe(inputsFrame)
+  saveFrame   <- tkframe(inputsFrame)
+  
+  # Choice sets
+  designName <- tclVar(dialog.values$designName)
+  design <- ttkentry(designFrame, width = "14",
+                     textvariable = designName)
+  
+  # None of these
+  noneVariable <- tclVar(dialog.values$ini.noneofthese)
+  noneCheckBox <- ttkcheckbutton(noneFrame, variable = noneVariable)
+  
+  # Block
+  nBLOCK <- eval(parse(text = paste0(tclvalue(designName),
+                                     "$design.information$nblocks")))
+  setBLOCK <- variableComboBox(blockFrame,
+                               variableList = seq(nBLOCK),
+                               initialSelection = "1",
+                               title = "Block number")
+  
+  # Save
+  saveVariable <- tclVar(dialog.values$saveVariable)
+  saveCheckBox <- ttkcheckbutton(saveFrame, variable = saveVariable)
+  
+  onOK <- function() {
+    BLOCK <- getSelection(setBLOCK)
+    
+    if (tclvalue(noneVariable) == 1) {
+      NONE <- TRUE
+    } else {
+      NONE <- FALSE
+    }
+    
+    if (tclvalue(saveVariable) == 1) {
+      SAVE <- TRUE
+    } else {
+      SAVE <- FALSE
+    }
+    
+    closeDialog()
+    
+    putRcmdr("DCEresponse.BLOCK", as.numeric(BLOCK))
+    putRcmdr("DCEresponse.NONE",  NONE)
+    putRcmdr("DCEresponse.SAVE",  SAVE)
+    
+    dceResponse()
+    
+    tkfocus(CommanderWindow())
+  }
+  
+  OKCancelHelp(helpSubject = "dceResponse")
+  
+  # Name of design
+  tkgrid(
+    labelRcmdr(
+      designFrame,
+      text = gettextRcmdr("Design ")),
+    design,
+    sticky = "w")
+  
+  # Check box for none of these option
+  tkgrid(
+    noneCheckBox,
+    labelRcmdr(
+      noneFrame,
+      text = gettextRcmdr("Opt-out option")),
+    sticky = "w")
+  
+  # Check box for save responses
+  tkgrid(
+    saveCheckBox,
+    labelRcmdr(
+      saveFrame,
+      text = gettextRcmdr("Save to file")),
+    sticky = "w")
+  
+  tkgrid(designFrame, sticky = "nw")
+  tkgrid(noneFrame,   sticky = "nw")
+  tkgrid(saveFrame,   sticky = "nw")
+
+  tkgrid(getFrame(setBLOCK), sticky = "w")
+  tkgrid(blockFrame, sticky = "nw")
+  
+  tkgrid(inputsFrame, sticky = "nw")
+  
+  tkgrid(buttonsFrame, columnspan = 2, sticky = "w")
+  
+  dialogSuffix()
+}
+
+###############################################################################
+
+dceResponse <- function() {
+  defaults <- list(
+    ini.Q = 1,
+    ini.bestName = "<no alternative selected>",
+    ini.designName = "DCEdesign")
+  dialog.values <- getDialog("dceResponse", defaults)
+  initializeDialog(title = gettextRcmdr("Collect Responses"))
+  
+  block <-getRcmdr("DCEresponse.BLOCK")
+  none  <-getRcmdr("DCEresponse.NONE")
+  save  <-getRcmdr("DCEresponse.SAVE")
+  
+  designName  <- tclVar(dialog.values$ini.designName)
+  designValue <- tclvalue(designName)
+  
+  nQues <- eval(parse(text = paste0(tclvalue(designName),
+                                    "$design.information$nquestions")))
+  nALTs <- eval(parse(text = paste0(tclvalue(designName),
+                                    "$design.information$nalternatives")))
+  nAtts <- eval(parse(text = paste0(tclvalue(designName),
+                                    "$design.information$nattributes")))
+
+  selectedBlockRows <- seq(nQues) + nQues * (block - 1)
+  
+  inputsFrame <- tkframe(top)
+  altFrame    <- tkframe(inputsFrame)
+  bestFrame   <- tkframe(inputsFrame)
+  okFrame     <- tkframe(inputsFrame)
+  
+  # Best
+  if(none == TRUE) {
+    varLIST <- c(paste0("alt. ", seq(nALTs)), "None of these")
+  } else {
+    varLIST <- paste0("alt. ", seq(nALTs))
+  }
+  bestitem <- variableComboBox(bestFrame,
+                               variableList = varLIST,
+                               nullSelection = "<no alternative selected>",
+                               adjustWidth = TRUE)
+  
+  onOK <- function() {
+    bestName <- getSelection(bestitem)
+    
+    if(bestName == "<no alternative selected>") {
+      errorCondition(
+        message = gettextRcmdr("Please select your best alternative"),
+        recall = dceResponse)
+      return()
+    }
+    
+    putDialog("dceResponse", list(
+      ini.Q          = dialog.values$ini.Q + 1,
+      ini.bestName   = "<no alternative selected>",
+      ini.designName = designValue))
+    
+    if(dialog.values$ini.Q == 1) {
+      set.seed(seed = NULL)
+      justDoIt(paste0("MyDCEresponses <- c(", sample.int(1e10, 1),
+                      ", ", block, ")"))
+    }
+    
+    justDoIt(paste0("MyDCEresponses <- c(MyDCEresponses, ",
+                    which(bestName == varLIST), ")"))
+    
+    closeDialog()
+    
+    if(dialog.values$ini.Q < nQues) {
+      dceResponse()
+    } else {
+      putDialog("dceResponse", list(
+        ini.Q = 1,
+        ini.bestName = "<no alternative selected>",
+        ini.designName = designValue))
+      
+      varNAMES <- paste0("'ID', 'BLOCK', '",
+                         paste0("Q", seq(nQues), collapse = "', '"),
+                         "'", collapse = "','")
+      cmd <- paste0('names(MyDCEresponses) <- c(', c(varNAMES), ')')
+      justDoIt(cmd)
+      doItAndPrint(paste0("MyDCEresponses"))
+      
+      # Save
+      if(isTRUE(save)) {
+        saveFile <- tclvalue(tkgetSaveFile(
+          filetypes = gettextRcmdr(
+            '{"CSV Files" {".csv" ".CSV"}}'),
+          defaultextension = ".csv",
+          initialfile = "MyDCEresponses.csv",
+          parent = CommanderWindow()))
+        if(saveFile == "") {
+          tkfocus(CommanderWindow())
+          return()
+        }
+        cmd <- paste0('write.csv(t(MyDCEresponses), file = "', saveFile,
+                      '", row.names = FALSE)')
+        justDoIt(cmd)
+        logger(cmd)
+        Message(
+          paste0(
+            gettextRcmdr("Your responses to DCE questions were exported to file: "),
+            saveFile),
+          type = "note")
+      }
+    }
+    tkfocus(CommanderWindow())
+  }
+  
+  onCancel <- function() {
+    #
+  }
+  
+  tkgrid(
+    labelRcmdr(
+      inputsFrame,
+      text = gettextRcmdr(paste0("Question ", dialog.values$ini.Q))),
+    sticky = "w")
+  
+  tkgrid(
+    labelRcmdr(
+      inputsFrame,
+      text = gettextRcmdr(
+        "Please select your most preferred alternative from the following:")),
+    sticky = "w")
+  
+  dsg <- eval(parse(text = paste0("dceResponseQ(", tclvalue(designName), ")")))
+  
+  for(i in seq(nALTs)) {
+    tkgrid(
+      labelRcmdr(
+        altFrame,
+        text = paste0(dsg[[selectedBlockRows[dialog.values$ini.Q]]][1, i], ": "),
+        fg = getRcmdr("title.color"),
+        font = "RcmdrTitleFont"),
+      labelRcmdr(
+        altFrame,
+        text = dsg[[selectedBlockRows[dialog.values$ini.Q]]][-1, i]),
+      sticky = "w")
+  }
+  tkgrid(altFrame, sticky = "w")
+  
+  tkgrid(
+    labelRcmdr(inputsFrame, text =""),
+    sticky = "w")
+  
+  tkgrid(labelRcmdr(bestFrame, text = "My most preferred: "),
+         getFrame(bestitem),
+         sticky = "w")
+  tkgrid(bestFrame, sticky = "w")
+  
+  okButton <- buttonRcmdr(okFrame,
+                          text = gettextRcmdr("OK"),
+                          foreground = "darkgreen",
+                          width = "10",
+                          command = onOK,
+                          default = "active",
+                          borderwidth = 3,
+                          image = "::image::okIcon",
+                          compound = "left")
+  tkgrid(okButton, sticky = "w")
+  tkconfigure(okButton, takefocus = 0)
+  tkgrid(
+    labelRcmdr(
+      inputsFrame,
+      text = ""),
+    sticky = "w")
+  tkgrid(okFrame, sticky = "nw")
+  
+  tkgrid(inputsFrame, sticky = "nw")
+  
+  dialogSuffix()
+}
+
+###############################################################################
+dceResponseQ <- function (design, common = NULL, quote = TRUE) {
+  nblocks <- design$design.information$nblocks
+  nquestions <- design$design.information$nquestions
+  nalternatives <- design$design.information$nalternatives
+  nattributes <- design$design.information$nattributes
+  attribute.names <- names(design[[1]][[1]])[-(1:3)]
+  my.design <- as.matrix(design[[1]][[1]])
+  
+  if (nalternatives >= 2) {
+    for (i in 2:nalternatives) {
+      my.design <- rbind(my.design, as.matrix(design$alternatives[[i]]))
+    }
+  }
+  
+  if (is.null(common) == FALSE) {
+    nalternatives <- nalternatives + 1
+    common.base <- design$alternatives[[1]]
+    common.base[, 3] <- nalternatives
+    common.base <- as.matrix(common.base)
+    for (i in attribute.names) {
+      common.base[, i] <- common[[i]]
+    }
+    my.design <- rbind(my.design, common.base)
+  }
+  
+  rownames(my.design) <- NULL
+  my.design <- data.frame(my.design)
+  my.design$BLOCK <- as.numeric(as.character(my.design$BLOCK))
+  my.design$QES <- as.numeric(as.character(my.design$QES))  
+  my.design$ALT <- as.numeric(as.character(my.design$ALT))
+  my.design <- my.design[order(my.design$BLOCK, my.design$QES, my.design$ALT), ]
+  alternative.names <- paste("alt.", 1:nalternatives, sep = "")
+  
+  DCEshow <- list(NULL)
+  
+  q <- 1
+  for (i in 1:nblocks) {
+    for (j in 1:nquestions) {
+      temp <- subset(my.design, my.design$BLOCK == i & my.design$QES == j)
+      temp <- temp[, 4:(3 + nattributes)]
+      if (nattributes == 1) {
+        temp <- as.data.frame(temp)
+        names(temp) <- attribute.names
+      }
+      temp <- t(temp)
+      colnames(temp) <- alternative.names
+      DCEshow[[q]] <- temp
+      DCEshow[[q]] <- rbind(colnames(DCEshow[[q]]), DCEshow[[q]])
+      q <- q + 1
+    }
+  }
+  return(DCEshow)
 }
 

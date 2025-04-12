@@ -1,5 +1,13 @@
 Changes to package RcmdrPlugin.DCE
 
+2025-04-12, version 0.2-5
+- Modified DESCRIPTION.
+
+2025-04-12, version 0.2-4
+- Added the dialog box for collecting responses to questions.
+- Added help file.
+- Modified DESCRIPTION.
+
 2024-05-21, version 0.2-3
 - Modified functions.
 - Modified help file.
