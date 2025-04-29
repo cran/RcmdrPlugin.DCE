@@ -45,6 +45,10 @@ shows DCE questions from the choice sets designed in the first dialog box
 using the function \code{\link[support.CEs]{questionnaire}} in 
 \pkg{support.CEs}.
 
+   \item The dialog box for \sQuote{\code{Collect responses...}} 
+shows three types of dialog boxes to collect user's responses to
+DCE questions according to choice sets designed in previous dialog box.
+
    \item The dialog box for \sQuote{\code{Create data set for analysis...}} 
 creates a data set for DCE analysis from the choice sets designed in the first 
 dialog box and a data set containing responses to DCE questions using 

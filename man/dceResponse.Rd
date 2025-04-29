@@ -37,9 +37,10 @@ two or more blocks, set the block number to which the user will be assigned.
 After confirming all the settings on the first dialog box, press
 the \sQuote{\code{OK}} button to continue.
 
-A series of dialog boxes (\sQuote{\code{Collect Responses}}) sequentially
-opens to collect the user's responses to DCE questions. In each dialog box,
-alternatives designed in the \sQuote{\code{Design Choice Sets for DCE}}
+A series of dialog boxes (\sQuote{\code{Collect Responses to DCE Questions}}) 
+sequentially opens to collect the user's responses to DCE questions. 
+In each dialog box, alternatives designed in the 
+\sQuote{\code{Design Choice Sets for DCE}}
 dialog box are presented. The user is asked to select their most preferred
 alternative from the drop-down list box. After making the selection,
 the user clicks the \sQuote{\code{OK}} button to open a new dialog box

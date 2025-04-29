@@ -1,18 +1,21 @@
 citHeader("To cite RcmdrPlugin.DCE in publications use:")
 
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date, perl = TRUE)
+vers <- paste("R package version", meta$Version)
+
 bibentry(
   bibtype = "Manual",
   title   = "{RcmdrPlugin.DCE: R Commander Plug-in for Discrete Choice Experiments}",
   author  = c(person("Hideo", "Aizaki")),
-  year    = 2025,
-  note    = "R package version 0.2-5",
+  year    = year,
+  note    = vers,
   url     = "https://CRAN.R-project.org/package=RcmdrPlugin.DCE",
 
   textVersion = 
-  paste("Aizaki H (2025).",
-        "RcmdrPlugin.DCE: R Commander Plug-in for Discrete Choice Experiments.",
-        "R package version 0.2-5.",
-        "URL https://CRAN.R-project.org/package=RcmdrPlugin.DCE.")
+  paste0("Aizaki H (", year, "). ",
+         "RcmdrPlugin.DCE: R Commander Plug-in for Discrete Choice Experiments. ",
+         vers, ". ",
+         "URL https://CRAN.R-project.org/package=RcmdrPlugin.DCE.")
 )
 
 bibentry(

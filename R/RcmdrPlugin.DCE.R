@@ -1172,7 +1172,7 @@ dceResponseSet <- function(){
   initializeDialog(title = gettextRcmdr("Set Options for Response Collection"))
   defaults <- list(designName      = "DCEdesign",
                    ini.noneofthese = "1",
-                   saveVariable    ="1")
+                   saveVariable    = "1")
   dialog.values = getDialog("dceResponseSet", defaults)
   
   ##### Input Frame #####
@@ -1197,6 +1197,7 @@ dceResponseSet <- function(){
   setBLOCK <- variableComboBox(blockFrame,
                                variableList = seq(nBLOCK),
                                initialSelection = "1",
+                               nullSelection = "<no block selected>",
                                title = "Block number")
   
   # Save
@@ -1205,6 +1206,13 @@ dceResponseSet <- function(){
   
   onOK <- function() {
     BLOCK <- getSelection(setBLOCK)
+    
+    if (BLOCK == "<no block selected>") {
+      Message(gettextRcmdr("Please select block number"), type = "warning")
+      closeDialog()
+      dceResponseSet()
+      return()
+    }
     
     if (tclvalue(noneVariable) == 1) {
       NONE <- TRUE
@@ -1272,12 +1280,12 @@ dceResponseSet <- function(){
 ###############################################################################
 
 dceResponse <- function() {
+  initializeDialog(title = gettextRcmdr("Collect Responses to DCE Questions"))
   defaults <- list(
-    ini.Q = 1,
-    ini.bestName = "<no alternative selected>",
+    ini.Q          = 1,
+    ini.bestName   = "<no alternative selected>",
     ini.designName = "DCEdesign")
   dialog.values <- getDialog("dceResponse", defaults)
-  initializeDialog(title = gettextRcmdr("Collect Responses"))
   
   block <-getRcmdr("DCEresponse.BLOCK")
   none  <-getRcmdr("DCEresponse.NONE")
@@ -1295,10 +1303,12 @@ dceResponse <- function() {
 
   selectedBlockRows <- seq(nQues) + nQues * (block - 1)
   
-  inputsFrame <- tkframe(top)
-  altFrame    <- tkframe(inputsFrame)
-  bestFrame   <- tkframe(inputsFrame)
-  okFrame     <- tkframe(inputsFrame)
+  inputsFrame   <- tkframe(top)
+  altFrame      <- tkframe(inputsFrame)
+  bestFrame     <- tkframe(inputsFrame)
+  okcancelFrame <- tkframe(top)  
+  okFrame       <- tkframe(okcancelFrame)
+  cancelFrame   <- tkframe(okcancelFrame)
   
   # Best
   if(none == TRUE) {
@@ -1315,9 +1325,10 @@ dceResponse <- function() {
     bestName <- getSelection(bestitem)
     
     if(bestName == "<no alternative selected>") {
-      errorCondition(
-        message = gettextRcmdr("Please select your best alternative"),
-        recall = dceResponse)
+      Message(gettextRcmdr("Please select your most preferred alternative"),
+              type = "warning")
+      closeDialog()
+      dceResponse()
       return()
     }
     
@@ -1341,8 +1352,8 @@ dceResponse <- function() {
       dceResponse()
     } else {
       putDialog("dceResponse", list(
-        ini.Q = 1,
-        ini.bestName = "<no alternative selected>",
+        ini.Q          = 1,
+        ini.bestName   = "<no alternative selected>",
         ini.designName = designValue))
       
       varNAMES <- paste0("'ID', 'BLOCK', '",
@@ -1379,7 +1390,14 @@ dceResponse <- function() {
   }
   
   onCancel <- function() {
-    #
+    closeDialog()
+    
+    putDialog("dceResponse", list(
+      ini.Q          = 1,
+      ini.bestName   = "<no alternative selected>",
+      ini.designName = designValue))
+    
+    tkfocus(CommanderWindow())
   }
   
   tkgrid(
@@ -1429,16 +1447,33 @@ dceResponse <- function() {
                           borderwidth = 3,
                           image = "::image::okIcon",
                           compound = "left")
+
+    cancelButton <- buttonRcmdr(cancelFrame,
+                          text = gettextRcmdr("Cancel"),
+                          foreground = "darkgreen",
+                          width = "10",
+                          command = onCancel,
+                          default = "active",
+                          borderwidth = 3,
+                          image = "::image::cancelIcon",
+                          compound = "left")
+  
+  
   tkgrid(okButton, sticky = "w")
   tkconfigure(okButton, takefocus = 0)
+  
+  tkgrid(cancelButton, sticky = "w")
+  tkconfigure(cancelButton, takefocus = 0)
+
   tkgrid(
     labelRcmdr(
       inputsFrame,
       text = ""),
     sticky = "w")
-  tkgrid(okFrame, sticky = "nw")
   
-  tkgrid(inputsFrame, sticky = "nw")
+  tkgrid(inputsFrame,          sticky = "nw")
+  tkgrid(okFrame, cancelFrame, sticky = "nw")
+  tkgrid(okcancelFrame,        sticky = "nw")
   
   dialogSuffix()
 }
@@ -1497,4 +1532,3 @@ dceResponseQ <- function (design, common = NULL, quote = TRUE) {
   }
   return(DCEshow)
 }
-
